@@ -1,0 +1,64 @@
+@using Microsoft.AspNetCore.Components
+@using MySecrets.DTO
+@using MySecrets.Services
+@using ScuolaRegionale.Services
+@inject NavigationManager _navManager
+@inject WebsiteAuthenticator _websiteAuthenticator
+
+
+<div class="container ">
+     <div class="row">
+            <div class="col"></div>
+            <div class="col">
+                <div style="text-align: center">
+                    <h1>Scuola LPV</h1>
+                    <h1>Gestione Corsi</h1>
+                    <img alt="Cai LPV" src="img/LogoCai.png" style="width: 370px"/>
+                </div>
+            </div>
+            <div class="col"></div>
+        </div>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col text-center">
+            <EditForm Model="LoginFormModel" OnSubmit="TryLogin">
+                <div class="form-group">
+                    <label>Nome Utente:</label>
+                    <InputText placeholder="Username" class="form-control" @bind-Value="LoginFormModel.UserName"/>
+                </div>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <InputText type="password" placeholder="Password" class="form-control" @bind-Value="LoginFormModel.Password"/>
+                </div>
+                <button type="submit" class="btn btn-primary fas fa-save">Accedi</button>
+            </EditForm>
+            
+                @if (!String.IsNullOrEmpty(_message)){
+                    <h2>    
+                        @_message
+                    </h2>
+                }
+        </div>
+        <div class="col"></div>
+    </div>
+
+</div>
+
+
+
+
+@code
+{
+    private LoginFormModel LoginFormModel { get; set; } = new();
+    private string _message="";
+
+    private async Task TryLogin()
+    {
+        int status=await _websiteAuthenticator.LoginAsync(LoginFormModel);
+        if (status == -1)
+        {
+            _message = "Autenticazione Fallita";
+        }
+       
+    }
+}

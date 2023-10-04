@@ -1,0 +1,92 @@
+@page "/"
+@using MySecrets.Model
+@using MySecrets.Services
+@using MySecrets.DTO
+@inject UserService _userService
+@inject AuthenticationStateProvider _authenticationStateProvider
+<PageTitle>Index</PageTitle>
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <button class="btn btn-info oi  oi-plus" @onclick="@(AddSecret)" title="Aggiungi Segreto"></button>
+    </tr>
+    <tr>
+        <th>Nome</th>
+        <th>Valore</th>
+    </tr>
+
+    </thead>
+    <tbody>
+    @if(_secrets!=null){
+    @foreach (MySecret secret in _secrets)
+    {
+
+        
+
+        <tr>
+            <td>@secret.Name</td>
+            <td>@secret.Value</td>
+            <td>
+                <button class="btn btn-info oi  oi-delete" @onclick="@(() => DeleteSecret(secret))" title="Elimina Segreto"></button>
+                <button class="btn btn-info oi  oi-pencil" @onclick="@(() => ModifySecret(secret))" title="Modifica Segreto"></button>
+            </td>
+        </tr>
+
+    }
+    }
+    </tbody>
+</table>
+@if (_showSecretForm)
+{
+    <UserSecretPopup User="_user" Secret="_secret" Save="@SaveSecretForm" Close="@CloseSecretForm"></UserSecretPopup>
+}
+
+@code
+{
+    private List<MySecret>? _secrets;
+    private bool _showSecretForm;
+    private User _user;
+    private MySecret _secret;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        var principal = authenticationState.User;
+        string username = principal.Identity.Name;
+        _user = _userService.FindByUserName(username);
+        _secrets = _user.Secrets;
+        if (_secrets == null)
+        {
+            _secrets = new List<MySecret>();
+        }
+    }
+
+    private void DeleteSecret(MySecret secret)
+    {
+        _userService.DeleteSecret(_user, secret);
+    }
+
+    private void AddSecret()
+    {
+        _secret = null;
+        _showSecretForm = true;
+    }
+
+    private void CloseSecretForm()
+    {
+        _showSecretForm = false;
+        StateHasChanged();
+    }
+
+
+    private void SaveSecretForm()
+    {
+        CloseSecretForm();
+    }
+
+    private void ModifySecret(MySecret secret)
+    {
+        _secret = secret;
+        _showSecretForm = true;
+    }
+}

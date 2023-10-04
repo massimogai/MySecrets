@@ -1,0 +1,66 @@
+@page "/users"
+@using MySecrets.Services
+@using MySecrets.Model
+@inject UserService _userService
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <button class="btn btn-info oi  oi-plus" @onclick="@(AddUser)" title="Aggiungi utente"></button>
+    </tr>
+    <tr>
+        <th>Nome</th>
+        <th></th>
+    </tr>
+
+    </thead>
+    <tbody>
+    @foreach (User user in _users)
+    {
+        <tr>
+            <td>@user.UserName</td>
+            <td>
+                <button class="btn btn-info oi  oi-delete" @onclick="@(() => DeleteUser(user))" title="Elimina utente"></button>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+@if (_showUserForm)
+{
+    <UserFormPopup Save="@SaveUserForm" Close="@CloseUserForm"></UserFormPopup>
+}
+
+@code
+{
+    protected override void OnInitialized()
+    {
+        _users = _userService.ListUsers();
+    }
+
+    private List<User> _users;
+    private bool _showUserForm;
+
+    private void DeleteUser(User user)
+    {
+        _userService.RemoveUser(user);
+    }
+
+    private void AddUser()
+    {
+        _showUserForm = true;
+    }
+
+    private void CloseUserForm()
+    {
+        _showUserForm = false;
+        StateHasChanged();
+    }
+
+
+    private void SaveUserForm(User user)
+    {
+        _userService.AddUser(user);
+        CloseUserForm();
+    }
+}

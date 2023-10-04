@@ -1,0 +1,38 @@
+﻿@using ScuolaRegionale.Services
+@using MySecrets.Services
+@inherits LayoutComponentBase
+@inject NavigationManager _navManager
+@inject WebsiteAuthenticator _websiteAuthenticator
+
+<PageTitle>ScuolaRegionale</PageTitle>
+
+<div class="page">
+    <AuthorizeView>
+        <Authorized>
+            <div class="sidebar">
+                <NavMenu/>
+            </div>
+            <main>
+                <div class="top-row px-4">
+                    <button type="button" class="btn btn-primary" @onclick="TryLogout">Logout</button>
+                </div>
+                <article class="content px-4">
+                    @Body
+                </article>
+            </main>
+        </Authorized>
+        <NotAuthorized>
+          <LoginDisplay></LoginDisplay>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+@code {
+   
+    private async Task TryLogout()
+    {
+        await _websiteAuthenticator.LogoutAsync();
+        _navManager.NavigateTo("/");
+    }
+
+}
